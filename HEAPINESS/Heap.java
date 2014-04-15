@@ -13,7 +13,6 @@ package HEAPINESS;
  * 
  */
 public interface Heap<V extends Comparable<V>> {
-	
 	public static enum MODE {MAX, MIN};
 
 	/**
@@ -30,7 +29,7 @@ public interface Heap<V extends Comparable<V>> {
 	 * @return
 	 */
 	public V remove();
-	
+
 	/**
 	 * @param array
 	 */
@@ -40,4 +39,15 @@ public interface Heap<V extends Comparable<V>> {
 	 * @return
 	 */
 	public V[] getSortedContents();
+
+	/**
+	 * @return
+	 */
+	public MODE getMode();
+
+	/**
+	 * @param mode
+	 */
+	public void setMode(MODE mode);
+
 }

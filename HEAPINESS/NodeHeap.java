@@ -1,17 +1,18 @@
 package HEAPINESS;
 
 public class NodeHeap<V extends Comparable<V>> implements Heap<V> {
-	
+
+	MODE mode;
 	private Node head;
-	
+
 	public NodeHeap(){
+		mode = NodeHeap.MODE.MAX;
 		head = null;
 	}
 	public void add(V value) {
 		/**
 		 * Adds a value to the based on dat good shit nigga!
 		 */
-
 		if(head==null){
 			head = new Node(value);
 		}
@@ -61,35 +62,92 @@ public class NodeHeap<V extends Comparable<V>> implements Heap<V> {
 		 * TODO CAREFUL OF SPECIAL CASES INVOLVING INNERMOST  WHILE LOOP
 		 * There could be problems with checking the rightmost grandchild of the node
 		 */
-		Node lastTemp;
+		V value = null;
+		//Node lastTemp = null;
 		Node temp = head;
-		while(temp.getRightChild()!=null){
-			if(temp.getLeftChild().leftDepth()>temp.getRightChild().rightDepth()){
-				temp=temp.getLeftChild();
-				if(temp.getLeftChild().leftDepth()==temp.getLeftChild().rightDepth()){
-					while(temp.getRightChild().getRightChild()!=null){
-						temp=temp.getRightChild();
-					}
-					/**
-					 * headtemp >>> head
-					 * head >>> last
-					 * last >>> headtemp
-					 * set root's children.parent to 
-					 */
-					lastTemp=temp.getRightChild();
-					head.getRightChild().setParent(lastTemp);//these two cut off the parent reference to head
-					head.getLeftChild().setParent(lastTemp);
-					head.setParent(temp);
-					temp.setRightChild(head);
+		if(head.getLeftChild()==null){
+			value = head.getValue();//careful with the return type
+			head = null;
+		}
+		else{
+			while(temp.getRightChild()!=null){//scales the tree to find the end/deals with right null child
+				if(temp.getLeftChild().leftDepth() > temp.getRightChild().leftDepth()){
+					temp = temp.getLeftChild();
+				}
+				else{
+					temp = temp.getRightChild();
 				}
 			}
+			if(temp.getLeftChild()!=null){
+				temp = temp.getLeftChild();
+				temp.getParent().setLeftChild(null);
+				value = head.getValue();
+				temp.setRightChild(head.getRightChild());
+				temp.setLeftChild(head.getRightChild());
+				head = temp;
+				temp.setParent(null);
+			}else{
+				temp.getParent().setRightChild(null);
+				value =  head.getValue();
+				temp.setRightChild(head.getRightChild());
+				temp.setLeftChild(head.getRightChild());
+				head = temp;
+				temp.setParent(null);
+			}
+			siftDown(head);
+			//be careful with the return type.
 		}
-		siftDown(head);
-		return null;
+		return value;
+		/**
+
+		 * creates the connections to the last and disconnects the original head
+		 * 
+		 */
+		//tempInt = (Integer) head.getValue();
+		//temp.getRightChild().setRightChild(head.getRightChild());
+		//temp.getLeftChild().setLeftChild(head.getLeftChild());
+		//head = temp.getRightChild();
+		//head.setParent(null);
+		//siftDown(head); IDEAS
 	}
-	private void siftDown(Node head2) {
+	private void siftDown(Node start) {
 		// TODO Auto-generated method stub
-		
+		Node temp = start;
+		boolean swapped;
+		if(start.leftDepth()!=1){
+			do{
+				swapped = false;
+				if(temp.getRightChild()!=null){//compare children, compare the highest to the parent@temp
+					if(compareValues(temp.getRightChild(), temp.getLeftChild())){
+						if(compareValues(temp.getRightChild(), temp)){
+							swapValues(temp, temp.getRightChild());
+							swapped = true;
+							temp = temp.getRightChild();
+						}
+					}else{
+						if(compareValues(temp.getLeftChild(), temp)){
+							swapValues(temp, temp.getLeftChild());
+							swapped = true;
+							temp = temp.getLeftChild();
+						}
+					}
+
+				}
+				else{
+					if(compareValues(temp.getLeftChild(), temp)){
+						swapValues(temp, temp.getLeftChild());
+						temp = temp.getLeftChild();
+					}
+				}
+
+			}while(swapped);
+		}
+	}
+	private boolean compareValues(Node temp, Node child) {
+		if(mode == NodeHeap.MODE.MAX){
+			return ((temp.getValue()).compareTo(child.getValue())>0);
+		}
+		return false;
 	}
 	private void swapValues(Node node1, Node node2) {
 		/**
@@ -99,10 +157,10 @@ public class NodeHeap<V extends Comparable<V>> implements Heap<V> {
 		 * swap by setting last element's children equal to heads children
 		 * and then setting head to the temp.getChild() from the other method.
 		 */
-		Node temp = node1;
-		node1=node2;
-		node2.setRightChild(temp.getRightChild());
-		node2
+		V value = node1.getValue();
+		node1.setValue(node2.getValue());
+		node2.setValue(value);
+
 	}
 	@Override
 	public V[] toArray(){
@@ -128,7 +186,7 @@ public class NodeHeap<V extends Comparable<V>> implements Heap<V> {
 		private Node rightChild;
 		private Node parent;
 		private V value;
-		
+
 		Node(V value){
 			leftChild = null;
 			rightChild = null;
@@ -146,12 +204,18 @@ public class NodeHeap<V extends Comparable<V>> implements Heap<V> {
 		}
 		void setLeftChild(Node node){
 			this.leftChild = node;
+			if(node!=null){
+				node.setParent(this);
+			}
 		}
 		Node getRightChild(){
 			return this.rightChild;
 		}
 		void setRightChild(Node node){
 			this.rightChild = node;
+			if(node!=null){
+				node.setParent(this);
+			}
 		}
 		Node getParent(){
 			return this.parent;
@@ -172,5 +236,15 @@ public class NodeHeap<V extends Comparable<V>> implements Heap<V> {
 			}
 			return (1 +rightChild.rightDepth());
 		}
+	}
+	@Override
+	public HEAPINESS.Heap.MODE getMode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public void setMode(HEAPINESS.Heap.MODE mode) {
+		// TODO Auto-generated method stub
+
 	}
 }
