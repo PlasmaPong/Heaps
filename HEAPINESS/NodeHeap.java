@@ -12,13 +12,14 @@ public class NodeHeap<V extends Comparable<V>> implements Heap<V> {
 	public void add(V value) {
 		/**
 		 * Adds a value to the based on dat good shit nigga!
+		 * if leftChild.leftDepth>RightChild.leftDepth, then 
 		 */
+		Node temp=head;
 		if(head==null){
 			head = new Node(value);
 		}
 		else{
-			Node temp=head;
-			while(temp.getRightChild()!=null){//deal with null rightChild case for each iteration
+			while(temp.getRightChild()!=null){
 				if(temp.getLeftChild().leftDepth()>temp.getRightChild().leftDepth()){
 					//case for filled left tree
 					if(temp.getLeftChild().leftDepth()==temp.getLeftChild().rightDepth()){
@@ -45,12 +46,30 @@ public class NodeHeap<V extends Comparable<V>> implements Heap<V> {
 			}
 			if(temp.getLeftChild()==null){//case for when neither exist at the start
 				temp.setLeftChild(new Node(value));
+				temp = temp.getLeftChild();
 			}
 			else{
 				temp.setRightChild(new Node(value));
+				temp=temp.getRightChild();
 			}
 		}
+		siftUp(temp);
 	}	
+	private void siftUp(Node node) {
+		// TODO Auto-generated method stub
+		boolean swapped  = true;
+		Node temp = node;
+		do{
+			if(temp.getParent()==null){
+				swapped = false;
+			}else{
+				if(compareValues(temp, temp.getParent())){
+					swapValues(temp, temp.getParent());
+					temp = temp.getParent();
+				}
+			}
+		}while(swapped);
+	}
 	@Override
 	public V remove(){
 		/**
@@ -111,13 +130,16 @@ public class NodeHeap<V extends Comparable<V>> implements Heap<V> {
 		//siftDown(head); IDEAS
 	}
 	private void siftDown(Node start) {
-		// TODO Auto-generated method stub
+		/**
+		 * compare children, compare the highest to the parent.  Swap if necessary
+		 * if the children and parent fulfill the heap property, then the sift fulfills the heap property
+		 */
 		Node temp = start;
 		boolean swapped;
 		if(start.leftDepth()!=1){
 			do{
 				swapped = false;
-				if(temp.getRightChild()!=null){//compare children, compare the highest to the parent@temp
+				if(temp.getRightChild()!=null){
 					if(compareValues(temp.getRightChild(), temp.getLeftChild())){
 						if(compareValues(temp.getRightChild(), temp)){
 							swapValues(temp, temp.getRightChild());
@@ -131,7 +153,6 @@ public class NodeHeap<V extends Comparable<V>> implements Heap<V> {
 							temp = temp.getLeftChild();
 						}
 					}
-
 				}
 				else{
 					if(compareValues(temp.getLeftChild(), temp)){
